@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0a0818">
+<meta name="format-detection" content="telephone=no">
+<meta name="description" content="刘天然，来打王者吧。">
+<title>刘天然，来打王者吧</title>
+<style>
+/* ============ 基础 ============ */
+:root{
+  --gold:#f7c948;
+  --gold-2:#ffe9a3;
+  --violet:#7b2ff7;
+  --pink:#ff3d8b;
+  --cyan:#39e0ff;
+  --safe-b:env(safe-area-inset-bottom,0px);
+  --safe-t:env(safe-area-inset-top,0px);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;}
+body{
+  background:#0a0818;
+  color:#fff;
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  overflow:hidden;
+  touch-action:manipulation;
+  overscroll-behavior:none;
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-font-smoothing:antialiased;
+}
+#app{position:fixed;inset:0;overflow:hidden;}
+
+/* ============ 背景 ============ */
+.bg{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(60% 45% at 15% 6%, rgba(123,47,247,.55), transparent 70%),
+    radial-gradient(55% 40% at 88% 10%, rgba(255,61,139,.32), transparent 70%),
+    radial-gradient(75% 55% at 50% 108%, rgba(57,224,255,.26), transparent 70%),
+    linear-gradient(180deg,#0a0818,#140a2e 55%,#0a0818);
+}
+.stars{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.star{position:absolute;color:rgba(255,232,160,.75);animation:twinkle 3s ease-in-out infinite;}
+@keyframes twinkle{
+  0%,100%{opacity:.12;transform:scale(.75);}
+  50%{opacity:1;transform:scale(1.2);}
+}
+
+/* ============ 屏幕 ============ */
+.screen{
+  position:absolute;inset:0;z-index:1;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:calc(26px + var(--safe-t)) 20px calc(26px + var(--safe-b));
+  text-align:center;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  opacity:0;pointer-events:none;
+  transition:opacity .42s ease, transform .42s ease;
+  transform:scale(.98);
+}
+.screen.active{opacity:1;pointer-events:auto;transform:scale(1);}
+
+/* ============ 开场 ============ */
+.kicker{
+  font-size:12px;letter-spacing:.22em;color:#b39ddb;
+  opacity:.85;margin-bottom:14px;
+}
+.title{
+  font-size:clamp(58px,19vw,104px);
+  font-weight:900;line-height:1.02;letter-spacing:.02em;
+  background:linear-gradient(180deg,#fffce0,#f7c948 46%,#df9310);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 8px 26px rgba(247,201,72,.35));
+  animation:pop .75s cubic-bezier(.2,1.5,.4,1) both;
+}
+@keyframes pop{
+  0%{transform:scale(.6) translateY(20px);opacity:0;}
+  100%{transform:scale(1) translateY(0);opacity:1;}
+}
+.sub{
+  font-size:clamp(17px,5vw,24px);
+  font-weight:800;color:#fff;
+  margin-top:10px;
+  text-shadow:0 0 22px rgba(123,47,247,.9);
+  animation:fadeUp .7s .25s both;
+}
+.sub em{font-style:normal;color:var(--gold-2);}
+.lead{
+  font-size:14px;line-height:1.85;color:#b6a8d9;
+  max-width:330px;margin:22px auto 0;
+  animation:fadeUp .7s .4s both;
+}
+.lead b{color:var(--gold-2);}
+@keyframes fadeUp{
+  0%{transform:translateY(14px);opacity:0;}
+  100%{transform:translateY(0);opacity:1;}
+}
+.hero-emoji{
+  font-size:34px;letter-spacing:12px;margin:20px 0 4px;
+  animation:float 2.6s ease-in-out infinite;
+  filter:drop-shadow(0 0 16px rgba(57,224,255,.45));
+}
+@keyframes float{
+  0%,100%{transform:translateY(0);}
+  50%{transform:translateY(-9px);}
+}
+
+/* ============ 按钮 ============ */
+.btn{
+  appearance:none;border:0;cursor:pointer;font-family:inherit;
+  font-weight:900;min-height:56px;padding:0 34px;
+  border-radius:18px;font-size:19px;color:#2a1600;
+  background:linear-gradient(180deg,#ffe9a3,#f7c948 45%,#e0a316);
+  box-shadow:0 6px 0 #8a5c06, 0 14px 30px rgba(247,201,72,.26);
+  transition:transform .12s ease, box-shadow .12s ease, opacity .25s ease;
+  margin-top:26px;
+  letter-spacing:.02em;
+  max-width:340px;
+}
+.btn:active{
+  transform:translateY(4px);
+  box-shadow:0 2px 0 #8a5c06, 0 6px 16px rgba(247,201,72,.22);
+}
+.btn:disabled{opacity:.35;filter:grayscale(.55);}
+
+/* ============ 选路 ============ */
+.head{padding-top:8px;animation:fadeUp .5s both;}
+.step{
+  display:inline-block;font-size:11px;letter-spacing:.18em;
+  color:var(--gold);border:1px solid rgba(247,201,72,.4);
+  border-radius:99px;padding:4px 12px;margin-bottom:14px;
+}
+h2{
+  font-size:clamp(23px,6.4vw,30px);font-weight:900;line-height:1.35;
+}
+.head p{font-size:13px;color:#a495c9;margin-top:10px;}
+
+.lanes{
+  display:grid;grid-template-columns:1fr 1fr;gap:11px;
+  width:100%;max-width:430px;margin:22px 0 4px;
+}
+.lane{
+  appearance:none;font-family:inherit;cursor:pointer;text-align:left;
+  background:rgba(255,255,255,.055);
+  border:2px solid rgba(255,255,255,.12);
+  border-radius:18px;padding:13px 13px 14px;color:#fff;
+  transition:transform .15s ease, border-color .15s ease, background .15s ease, box-shadow .15s ease;
+}
+.lane:active{transform:scale(.97);}
+.lane.sel{
+  border-color:var(--gold);
+  background:rgba(247,201,72,.14);
+  box-shadow:0 0 0 1px var(--gold), 0 10px 30px rgba(247,201,72,.22);
+}
+.lane-ico{font-size:25px;line-height:1;}
+.lane-name{font-size:16px;font-weight:900;margin:7px 0 4px;color:var(--gold-2);}
+.lane-desc{font-size:11.5px;line-height:1.6;color:#a99cd0;}
+.lane:last-child{grid-column:1 / -1;}
+
+/* ============ 邀约 ============ */
+.invite-box{width:100%;max-width:400px;}
+.invite-box h2{font-size:clamp(26px,7.6vw,34px);}
+.invite-sub{font-size:13px;color:#a495c9;margin-top:12px;}
+.choice{
+  position:relative;display:flex;gap:16px;justify-content:center;align-items:center;
+  min-height:150px;margin-top:34px;
+}
+.btn.yes{background:linear-gradient(180deg,#ffd0e4,#ff5fa2 42%,#e02c78);color:#fff;
+  box-shadow:0 6px 0 #8c1046, 0 14px 32px rgba(255,61,139,.32);margin-top:0;}
+.btn.yes:active{box-shadow:0 2px 0 #8c1046, 0 6px 16px rgba(255,61,139,.26);}
+.btn.no{
+  background:rgba(255,255,255,.1);color:#cbbfdd;
+  border:2px solid rgba(255,255,255,.16);
+  box-shadow:none;margin-top:0;
+  transition:transform .18s cubic-bezier(.3,1.4,.5,1), opacity .3s ease;
+  will-change:transform;
+}
+
+/* ============ 小游戏 ============ */
+.screen#s-game{
+  justify-content:flex-start;align-items:stretch;
+  padding:calc(10px + var(--safe-t)) 0 0;
+  overflow:hidden;
+}
+.hud{
+  display:flex;gap:9px;padding:0 14px 10px;flex:0 0 auto;
+}
+.hud-item{
+  flex:1;background:rgba(255,255,255,.065);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:14px;padding:7px 4px;
+  font-size:11px;color:#a495c9;letter-spacing:.05em;
+}
+.hud-item b{
+  display:block;font-size:19px;color:#fff;margin-top:2px;
+  font-variant-numeric:tabular-nums;letter-spacing:0;
+}
+.arena{
+  position:relative;flex:1;min-height:0;width:100%;overflow:hidden;
+  touch-action:none;
+  background:radial-gradient(120% 70% at 50% 105%, rgba(57,224,255,.12), transparent 62%);
+}
+.arena::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+  background-size:100% 56px, 56px 100%;
+}
+.hpbar{
+  position:absolute;left:50%;bottom:62px;transform:translateX(-50%);
+  width:156px;height:9px;border-radius:99px;
+  background:rgba(255,255,255,.14);overflow:hidden;
+  border:1px solid rgba(255,255,255,.14);
+}
+.hpbar i{
+  display:block;height:100%;width:100%;
+  background:linear-gradient(90deg,#ff5d73,#ffd166);
+  transition:width .22s ease;
+}
+.base{
+  position:absolute;left:50%;bottom:4px;transform:translateX(-50%);
+  font-size:46px;line-height:1;
+  filter:drop-shadow(0 0 20px rgba(247,201,72,.65));
+}
+.foe{
+  position:absolute;top:0;left:0;
+  display:flex;align-items:center;justify-content:center;
+  will-change:transform;cursor:pointer;
+  filter:drop-shadow(0 4px 10px rgba(0,0,0,.45));
+}
+.foe.fast{filter:drop-shadow(0 0 12px rgba(255,90,90,.85));}
+.foe.bonus{filter:drop-shadow(0 0 16px rgba(57,224,255,.9));}
+.pop{
+  position:absolute;pointer-events:none;
+  font-size:17px;font-weight:900;color:var(--gold-2);
+  text-shadow:0 2px 8px rgba(0,0,0,.6);
+  will-change:transform,opacity;
+}
+.shake{animation:shake .3s ease;}
+@keyframes shake{
+  0%,100%{transform:translateX(0);}
+  25%{transform:translateX(-7px);}
+  50%{transform:translateX(6px);}
+  75%{transform:translateX(-4px);}
+}
+.hint{
+  flex:0 0 auto;font-size:11.5px;color:#8d7fb3;
+  padding:9px 0 calc(12px + var(--safe-b));
+  text-align:center;letter-spacing:.04em;
+}
+
+/* ============ 结算 ============ */
+.rank-icon{
+  font-size:62px;line-height:1;
+  filter:drop-shadow(0 0 28px rgba(247,201,72,.7));
+  animation:pop .6s cubic-bezier(.2,1.5,.4,1) both;
+}
+.rank-name{
+  font-size:clamp(25px,7vw,32px);font-weight:900;margin-top:8px;
+  background:linear-gradient(180deg,#fffce0,#f7c948 50%,#df9310);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.rank-line{
+  font-size:13.5px;line-height:1.8;color:#b6a8d9;
+  max-width:300px;margin:12px auto 0;
+}
+.card{
+  width:100%;max-width:340px;margin:20px 0 6px;
+  background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.035));
+  border:1px solid rgba(247,201,72,.32);
+  border-radius:20px;padding:4px 18px;
+  box-shadow:0 18px 50px rgba(0,0,0,.45);
+}
+.card-row{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:14px;padding:11px 0;
+  border-bottom:1px dashed rgba(255,255,255,.12);
+  font-size:13px;color:#a99cd0;
+}
+.card-row:last-child{border-bottom:0;}
+.card-row b{color:var(--gold-2);font-size:14.5px;text-align:right;}
+
+/* ============ 杂项 ============ */
+.mute{
+  position:fixed;top:calc(10px + var(--safe-t));right:12px;z-index:9;
+  width:38px;height:38px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.16);
+  background:rgba(10,8,24,.55);color:#fff;
+  font-size:16px;line-height:1;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+}
+.confetti{
+  position:fixed;z-index:99;pointer-events:none;font-size:22px;
+  will-change:transform,opacity;
+}
+.tiny{
+  font-size:11px;color:#786a9c;line-height:1.8;
+  margin-top:18px;letter-spacing:.03em;
+}
+</style>
+</head>
+<body oncontextmenu="return false">
+
+<div class="bg"></div>
+<div class="stars"></div>
+
+<button class="mute" id="muteBtn" type="button" aria-label="声音开关">🔊</button>
+
+<div id="app">
+
+  <!-- ============ 开场 ============ -->
+  <section class="screen active" id="s-intro">
+    <p class="kicker">峡 谷 门 口 · 一 个 人 的 邀 约</p>
+    <h1 class="title">刘天然</h1>
+    <p class="sub">王者峡谷，<em>缺你一个</em></p>
+    <div class="hero-emoji">🏰⚔️🏹</div>
+    <p class="lead">
+      看到这行字，说明你已经被我锁定了。<br>
+      别急着退，后面有一个<b>只能你亲手点完</b>的东西。
+    </p>
+    <button class="btn" id="btnStart" type="button">点我 · 别拒绝</button>
+    <p class="tiny">纯手工制作 · 无广告 · 无跳转 · 只有我</p>
+  </section>
+
+  <!-- ============ 选位置 ============ -->
+  <section class="screen" id="s-lane">
+    <div class="head">
+      <span class="step">第 1 步 / 2</span>
+      <h2>你的本命是哪一路？</h2>
+      <p>选好之后，剩下四路都算我的</p>
+    </div>
+
+    <div class="lanes" id="lanes">
+      <button class="lane" type="button" data-lane="对抗路">
+        <div class="lane-ico">🛡️</div>
+        <div class="lane-name">对抗路</div>
+        <div class="lane-desc">你总是一个人在上路硬扛，这回让我陪你</div>
+      </button>
+      <button class="lane" type="button" data-lane="打野">
+        <div class="lane-ico">🗡️</div>
+        <div class="lane-name">打野</div>
+        <div class="lane-desc">满地图乱窜还嫌别人慢，就你最有精神</div>
+      </button>
+      <button class="lane" type="button" data-lane="中路">
+        <div class="lane-ico">🔮</div>
+        <div class="lane-name">中路</div>
+        <div class="lane-desc">中路交给最稳的人，我看来看去只有你</div>
+      </button>
+      <button class="lane" type="button" data-lane="发育路">
+        <div class="lane-ico">🏹</div>
+        <div class="lane-name">发育路</div>
+        <div class="lane-desc">前期你别急，后期我养你</div>
+      </button>
+      <button class="lane" type="button" data-lane="游走">
+        <div class="lane-ico">🩹</div>
+        <div class="lane-name">游走</div>
+        <div class="lane-desc">到处救人的善良，别只用在路人身上</div>
+      </button>
+    </div>
+
+    <button class="btn" id="btnLaneNext" type="button" disabled>下一步</button>
+  </section>
+
+  <!-- ============ 邀约 ============ -->
+  <section class="screen" id="s-invite">
+    <div class="invite-box">
+      <span class="step">第 2 步 / 2</span>
+      <h2>今晚八点，峡谷见？</h2>
+      <p class="invite-sub">（右边那个按钮会跑，别追了）</p>
+
+      <div class="choice">
+        <button class="btn yes" id="btnYes" type="button">来</button>
+        <button class="btn no" id="btnNo" type="button">不来</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 小游戏 ============ -->
+  <section class="screen" id="s-game">
+    <div class="hud">
+      <div class="hud-item">剩余时间<b id="hudTime">15.0</b></div>
+      <div class="hud-item">战绩分<b id="hudScore">0</b></div>
+      <div class="hud-item">水晶血量<b id="hudHp">5</b></div>
+    </div>
+    <div class="arena" id="arena">
+      <div class="hpbar"><i id="hpFill"></i></div>
+      <div class="base">🏰</div>
+    </div>
+    <p class="hint">点掉冲过来的小兵 · 别让它们碰到水晶</p>
+  </section>
+
+  <!-- ============ 结算 ============ -->
+  <section class="screen" id="s-result">
+    <div class="rank-icon" id="rankIcon">👑</div>
+    <h2 class="rank-name" id="rankName">最强王者</h2>
+    <p class="rank-line" id="rankLine"></p>
+
+    <div class="card">
+      <div class="card-row"><span>召唤师</span><b>刘天然</b></div>
+      <div class="card-row"><span>位置</span><b id="cardLane">游走</b></div>
+      <div class="card-row"><span>战绩</span><b id="cardScore">击破 0 波</b></div>
+      <div class="card-row"><span>水晶</span><b id="cardHp">满血</b></div>
+      <div class="card-row"><span>评价</span><b id="cardEval">峡谷待认证</b></div>
+    </div>
+
+    <button class="btn" id="btnAgain" type="button">再守一次</button>
+    <p class="tiny">截图发我 · 我已经在峡谷门口等你了</p>
+  </section>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ======================= 工具 ======================= */
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var rand = function (a, b) { return a + Math.random() * (b - a); };
+  var pick = function (arr) { return arr[Math.floor(Math.random() * arr.length)]; };
+
+  /* ======================= 背景星星 ======================= */
+  (function stars() {
+    var box = $('.stars');
+    var glyphs = ['✦', '✧', '·', '✩', '+'];
+    for (var i = 0; i < 26; i++) {
+      var s = document.createElement('span');
+      s.className = 'star';
+      s.textContent = pick(glyphs);
+      s.style.left = rand(0, 100).toFixed(2) + '%';
+      s.style.top = rand(0, 100).toFixed(2) + '%';
+      s.style.fontSize = rand(8, 17).toFixed(0) + 'px';
+      s.style.animationDelay = rand(0, 3).toFixed(2) + 's';
+      s.style.animationDuration = rand(2.4, 5).toFixed(2) + 's';
+      box.appendChild(s);
+    }
+  })();
+
+  /* ======================= 声音 ======================= */
+  var ac = null;
+  var muted = false;
+
+  function AC() {
+    if (muted) return null;
+    try {
+      if (!ac) ac = new (window.AudioContext || window.webkitAudioContext)();
+      if (ac.state === 'suspended') ac.resume();
+      return ac;
+    } catch (e) { return null; }
+  }
+
+  function tone(freq, dur, type, vol, delay) {
+    var c = AC();
+    if (!c) return;
+    dur = dur || 0.12;
+    var t = c.currentTime + (delay || 0);
+    var o = c.createOscillator();
+    var g = c.createGain();
+    o.type = type || 'sine';
+    o.frequency.setValueAtTime(freq, t);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol || 0.09, t + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g);
+    g.connect(c.destination);
+    o.start(t);
+    o.stop(t + dur + 0.03);
+  }
+
+  var SCALE = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50];
+  var PATTERN = [0, 2, 3, 2, 4, 3, 2, 0, 1, 2, 3, 4, 3, 2, 1, 0];
+  var bgmTimer = null, bgmStep = 0;
+
+  function startBgm() {
+    if (bgmTimer || muted) return;
+    bgmStep = 0;
+    bgmTimer = setInterval(function () {
+      if (muted) return;
+      var n = SCALE[PATTERN[bgmStep % PATTERN.length]];
+      tone(n / 2, 0.19, 'triangle', 0.032, 0);
+      if (bgmStep % 4 === 2) tone(n / 4, 0.28, 'sine', 0.022, 0);
+      bgmStep++;
+    }, 250);
+  }
+  function stopBgm() {
+    if (bgmTimer) { clearInterval(bgmTimer); bgmTimer = null; }
+  }
+
+  var sfx = {
+    tap:   function () { tone(880, 0.06, 'square', 0.045); },
+    hit:   function () { tone(1180, 0.05, 'square', 0.045); },
+    bonus: function () { tone(1320, 0.07, 'square', 0.05); tone(1760, 0.07, 'square', 0.04, 0.06); },
+    miss:  function () { tone(150, 0.2, 'sawtooth', 0.06); },
+    win:   function () { [523.25, 659.25, 783.99, 1046.5].forEach(function (f, i) { tone(f, 0.22, 'triangle', 0.065, i * 0.1); }); },
+    lose:  function () { [392, 330, 262, 196].forEach(function (f, i) { tone(f, 0.25, 'sawtooth', 0.05, i * 0.12); }); },
+    deny:  function () { tone(220, 0.1, 'square', 0.045); }
+  };
+
+  $('#muteBtn').addEventListener('click', function () {
+    muted = !muted;
+    this.textContent = muted ? '🔇' : '🔊';
+    if (muted) stopBgm(); else startBgm();
+  });
+
+  /* ======================= 屏幕切换 ======================= */
+  function show(id) {
+    $$('.screen').forEach(function (el) {
+      el.classList.toggle('active', el.id === id);
+    });
+  }
+
+  /* ======================= 粒子 ======================= */
+  var CONFETTI = ['✨', '⭐', '🎉', '💛', '🔥', '🌟', '💫'];
+
+  function burst(x, y, n) {
+    for (var i = 0; i < n; i++) {
+      var s = document.createElement('span');
+      s.className = 'confetti';
+      s.textContent = pick(CONFETTI);
+      s.style.left = x + 'px';
+      s.style.top = y + 'px';
+      document.body.appendChild(s);
+      (function (node) {
+        var dx = rand(-150, 150), dy = rand(-240, -50), rot = rand(-360, 360);
+        var a = node.animate([
+          { transform: 'translate(-50%,-50%) scale(1) rotate(0deg)', opacity: 1 },
+          { transform: 'translate(calc(-50% + ' + dx + 'px), calc(-50% + ' + dy + 'px)) rotate(' + rot + 'deg) scale(.35)', opacity: 0 }
+        ], { duration: rand(700, 1250), easing: 'cubic-bezier(.2,.7,.3,1)' });
+        a.onfinish = function () { node.remove(); };
+      })(s);
+    }
+  }
+
+  function popText(x, y, txt) {
+    var s = document.createElement('span');
+    s.className = 'pop';
+    s.textContent = txt;
+    s.style.left = x + 'px';
+    s.style.top = y + 'px';
+    $('#arena').appendChild(s);
+    var a = s.animate([
+      { transform: 'translate(-50%,-50%) scale(.75)', opacity: 1 },
+      { transform: 'translate(-50%,-150%) scale(1.15)', opacity: 0 }
+    ], { duration: 620, easing: 'ease-out' });
+    a.onfinish = function () { s.remove(); };
+  }
+
+  /* ======================= 开场 ======================= */
+  $('#btnStart').addEventListener('click', function () {
+    sfx.tap();
+    startBgm();
+    show('s-lane');
+  });
+
+  /* ======================= 选位置 ======================= */
+  var lane = '';
+
+  $$('.lane').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      $$('.lane').forEach(function (x) { x.classList.remove('sel'); });
+      btn.classList.add('sel');
+      lane = btn.getAttribute('data-lane');
+      $('#btnLaneNext').disabled = false;
+      sfx.tap();
+    });
+  });
+
+  $('#btnLaneNext').addEventListener('click', function () {
+    sfx.tap();
+    show('s-invite');
+  });
+
+  /* ======================= 邀约（躲闪按钮） ======================= */
+  var DENY = ['不来', '再想想', '真的不来？', '你点不到我', '我躲！', '别嘛~', '按钮已认输'];
+  var denyN = 0;
+  var noBtn = $('#btnNo');
+  var yesBtn = $('#btnYes');
+  var choice = $('.choice');
+
+  function dodge() {
+    denyN++;
+    sfx.deny();
+    noBtn.textContent = DENY[Math.min(denyN, DENY.length - 1)];
+
+    var box = choice.getBoundingClientRect();
+    var nx = rand(-box.width * 0.32, box.width * 0.32);
+    var ny = rand(-box.height * 0.3, box.height * 0.3);
+    var sc = Math.max(0.34, 1 - denyN * 0.13);
+    noBtn.style.transform = 'translate(' + nx + 'px,' + ny + 'px) scale(' + sc + ')';
+    yesBtn.style.transform = 'scale(' + (1 + Math.min(denyN, 5) * 0.13) + ')';
+
+    if (denyN >= 6) {
+      noBtn.style.opacity = '0';
+      noBtn.style.pointerEvents = 'none';
+      yesBtn.textContent = '这就对了，来！';
+    }
+  }
+
+  noBtn.addEventListener('click', function (e) {
+    e.preventDefault();
+    dodge();
+  });
+
+  yesBtn.addEventListener('click', function () {
+    sfx.bonus();
+    burst(window.innerWidth / 2, window.innerHeight / 2, 26);
+    setTimeout(startGame, 620);
+  });
+
+  /* ======================= 小游戏 ======================= */
+  var DURATION = 15;
+  var G = {
+    running: false, hp: 5, maxHp: 5, score: 0,
+    t: 0, spawnT: 0, last: 0, raf: 0, foes: []
+  };
+
+  var TYPES = [
+    { emoji: '👾', pts: 1, speed: 1.00, weight: 62, cls: '' },
+    { emoji: '🦖', pts: 2, speed: 1.42, weight: 26, cls: 'fast' },
+    { emoji: '💎', pts: 3, speed: 0.82, weight: 12, cls: 'bonus' }
+  ];
+
+  function weighted(list) {
+    var total = 0, i;
+    for (i = 0; i < list.length; i++) total += list[i].weight;
+    var r = Math.random() * total;
+    for (i = 0; i < list.length; i++) {
+      r -= list[i].weight;
+      if (r <= 0) return list[i];
+    }
+    return list[0];
+  }
+
+  function clearFoes() {
+    G.foes.forEach(function (f) { f.el.remove(); });
+    G.foes = [];
+  }
+
+  function startGame() {
+    clearFoes();
+    G.running = true;
+    G.hp = G.maxHp;
+    G.score = 0;
+    G.t = 0;
+    G.spawnT = 0.4;
+    $('#hudHp').textContent = String(G.hp);
+    $('#hudScore').textContent = '0';
+    $('#hudTime').textContent = DURATION.toFixed(1);
+    $('#hpFill').style.width = '100%';
+    show('s-game');
+    startBgm();
+    G.last = performance.now();
+    cancelAnimationFrame(G.raf);
+    G.raf = requestAnimationFrame(loop);
+  }
+
+  function spawnFoe() {
+    var arena = $('#arena');
+    var W = arena.clientWidth;
+    var p = Math.min(1, G.t / DURATION);
+    var type = weighted(TYPES);
+    var size = type.cls === 'bonus' ? 44 : 54;
+
+    var el = document.createElement('div');
+    el.className = 'foe ' + type.cls;
+    el.textContent = type.emoji;
+    el.style.width = size + 'px';
+    el.style.height = size + 'px';
+    el.style.fontSize = Math.round(size * 0.78) + 'px';
+
+    var x = rand(6, Math.max(10, W - size - 6));
+
+    // 按屏幕高度反推速度：落到底部所需时间从 3.6s 递减到 2.0s
+    // （写死 px/s 在不同高度的手机上会差很多）
+    var H = arena.clientHeight || 620;
+    var fallTime = 3.6 - 1.6 * p;
+    var speed = ((H + size + 12) / fallTime) * type.speed;
+
+    var f = { el: el, x: x, y: -size - 12, vy: speed, pts: type.pts };
+
+    el.style.transform = 'translate3d(' + f.x + 'px,' + f.y + 'px,0)';
+    el.addEventListener('pointerdown', function (ev) {
+      ev.preventDefault();
+      ev.stopPropagation();
+      hitFoe(f);
+    });
+
+    arena.appendChild(el);
+    G.foes.push(f);
+  }
+
+  function hitFoe(f) {
+    var i = G.foes.indexOf(f);
+    if (i < 0) return;
+    G.foes.splice(i, 1);
+    f.el.remove();
+    G.score += f.pts;
+    $('#hudScore').textContent = String(G.score);
+    if (f.pts > 1) sfx.bonus(); else sfx.hit();
+    popText(f.x + 26, f.y + 12, '+' + f.pts);
+  }
+
+  function removeFoeAt(i) {
+    var f = G.foes[i];
+    if (!f) return;
+    G.foes.splice(i, 1);
+    f.el.remove();
+  }
+
+  function damage() {
+    G.hp--;
+    sfx.miss();
+    $('#hudHp').textContent = String(Math.max(0, G.hp));
+    $('#hpFill').style.width = Math.max(0, (G.hp / G.maxHp) * 100) + '%';
+    var arena = $('#arena');
+    arena.classList.add('shake');
+    setTimeout(function () { arena.classList.remove('shake'); }, 320);
+    if (navigator.vibrate && G.hp > 0) navigator.vibrate(30);
+  }
+
+  function loop(now) {
+    if (!G.running) return;
+
+    var dt = (now - G.last) / 1000;
+    G.last = now;
+    if (dt > 0.08) dt = 0.08;
+    G.t += dt;
+
+    var left = Math.max(0, DURATION - G.t);
+    $('#hudTime').textContent = left.toFixed(1);
+
+    G.spawnT -= dt;
+    if (G.spawnT <= 0 && left > 0.45) {
+      spawnFoe();
+      var p = Math.min(1, G.t / DURATION);
+      G.spawnT = (0.88 - 0.42 * p) * rand(0.75, 1.35);
+    }
+
+    var arena = $('#arena');
+    var floor = arena.clientHeight - 62;
+
+    for (var i = G.foes.length - 1; i >= 0; i--) {
+      var f = G.foes[i];
+      f.y += f.vy * dt;
+      f.el.style.transform = 'translate3d(' + f.x + 'px,' + f.y + 'px,0)';
+      if (f.y > floor) {
+        removeFoeAt(i);
+        damage();
+      }
+    }
+
+    if (G.hp <= 0) { endGame(false); return; }
+    if (left <= 0) { endGame(true); return; }
+
+    G.raf = requestAnimationFrame(loop);
+  }
+
+  function endGame(win) {
+    G.running = false;
+    cancelAnimationFrame(G.raf);
+    stopBgm();
+    if (win) sfx.win(); else sfx.lose();
+    if (navigator.vibrate) navigator.vibrate(win ? [20, 60, 20] : 120);
+    setTimeout(function () {
+      renderResult(win);
+      show('s-result');
+    }, win ? 450 : 750);
+  }
+
+  /* ======================= 结算 ======================= */
+  var LINES = [
+    '以上战绩纯属虚构，想跟你打游戏是认真的。',
+    '水晶守住了，可峡谷还是缺一个人。',
+    '段位是打的，等你是真的。',
+    '这波操作是演的，这波心动不是。',
+    '我在峡谷门口站了十五秒，等了你一晚上。'
+  ];
+
+  function rankOf(score, win) {
+    if (!win) return { icon: '💀', name: '峡谷失踪人口', eval: '水晶没了，但你还在我这儿' };
+    if (score < 8)  return { icon: '🥉', name: '倔强青铜', eval: '手速感人，诚意满分' };
+    if (score < 16) return { icon: '🥈', name: '秩序白银', eval: '有天赋，但明显没认真' };
+    if (score < 26) return { icon: '🥇', name: '荣耀黄金', eval: '这水平，够打排位了' };
+    if (score < 38) return { icon: '💎', name: '永恒钻石', eval: '我怀疑你偷偷练过' };
+    return { icon: '👑', name: '最强王者', eval: '别装了，你就是王者' };
+  }
+
+  function renderResult(win) {
+    var r = rankOf(G.score, win);
+    $('#rankIcon').textContent = r.icon;
+    $('#rankName').textContent = r.name;
+    $('#rankLine').textContent = pick(LINES);
+    $('#cardLane').textContent = lane || '游走';
+    $('#cardScore').textContent = '击破 ' + G.score + ' 波';
+    $('#cardHp').textContent = win ? '满血' : '阵亡';
+    $('#cardEval').textContent = r.eval;
+  }
+
+  $('#btnAgain').addEventListener('click', function () {
+    sfx.tap();
+    startGame();
+  });
+
+  /* ======================= 兜底 ======================= */
+  document.addEventListener('gesturestart', function (e) { e.preventDefault(); });
+})();
+</script>
+</body>
+</html>
